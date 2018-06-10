@@ -29,6 +29,7 @@ int main(int argc, char **argv) {
   int gol_esq;
   int gol_dir;
   int rand_pos;
+  int espaco_vazio;
 
   // conecta com o controlador do campo
   campo_conecta(argc, argv);
@@ -70,11 +71,13 @@ int main(int argc, char **argv) {
     printf("\n");
 
     for (i = 0; i < tam_campo; i++){
+      printf("%c ", campo[i]);
       if (campo[i] == 'o'){
          pos_bola2 = i;
       }
     }
-    printf("Bola na pos: %d\n", pos_bola2 + 1);
+    printf("\n");
+//    printf("Bola na pos: %d\n", pos_bola2 + 1);
     // testar se eh possivel chutar ao gol
     // se sim, chutar
 
@@ -101,7 +104,7 @@ int main(int argc, char **argv) {
       chutes_esq[num_chutes_esq]=j;
       num_chutes_esq++;
       gol_esq = 1;
-      printf("Eh possivel fazer gol no lado esquerdo! (chutar para %d)\n", j);
+//      printf("Eh possivel fazer gol no lado esquerdo! (chutar para %d)\n", j);
     }
     // testa lado direito
     j = pos_bola2 + 1;
@@ -118,11 +121,11 @@ int main(int argc, char **argv) {
         j++;
       }
     }
-    printf("%d\n", j);
-    printf("%d\n", tam_campo);
-    printf("%c\n", campo[tam_campo - 1]);
+//    printf("%d\n", j);
+//    printf("%d\n", tam_campo);
+//    printf("%c\n", campo[tam_campo - 1]);
     if (j == tam_campo && campo[tam_campo - 1] == 'f'){
-      printf("Eh possivel fazer gol no lado direito! (chutar para %d)\n", j+1);
+  //    printf("Eh possivel fazer gol no lado direito! (chutar para %d)\n", j+1);
       chutes_dir[num_chutes_dir]=j + 1;
       num_chutes_dir++;
       gol_dir = 1;
@@ -135,7 +138,7 @@ int main(int argc, char **argv) {
             sprintf(num, "%d ", chutes_esq[i]);
             strcat(buf, num);
       }
-      printf("Eh possivel os seguintes chutes para a esquerda: %s\n", buf);
+ //     printf("Eh possivel os seguintes chutes para a esquerda: %s\n", buf);
     }
 
     if (num_chutes_dir > 0){
@@ -145,7 +148,7 @@ int main(int argc, char **argv) {
             sprintf(num, "%d ", chutes_dir[i]);
             strcat(buf, num);
       }
-      printf("Eh possivel os seguintes chutes para a direita: %s\n", buf);
+//      printf("Eh possivel os seguintes chutes para a direita: %s\n", buf);
     }
 
     if (lado_meu == 'e' && gol_dir == 1){
@@ -154,9 +157,9 @@ int main(int argc, char **argv) {
       for (i = 0; i < num_chutes_dir; i++){
           sprintf(num, "%d ", chutes_dir[i]);
           strcat(buf, num);
-          printf("Buf: %s\n", buf);
+ //         printf("Buf: %s\n", buf);
         }
-      printf("Chute teste: %s\n", buf);
+//      printf("Chute teste: %s\n", buf);
     }
     else if (lado_meu == 'd' && gol_esq == 1){
 //      chutar_gol_esq
@@ -164,18 +167,34 @@ int main(int argc, char **argv) {
       for (i = 0; i < num_chutes_esq; i++){
           sprintf(num, "%d ", chutes_esq[i]);
           strcat(buf, num);
-          printf("Buf: %s\n", buf);
+  //        printf("Buf: %s\n", buf);
         }
-      printf("Chute teste: %s\n", buf);
+//      printf("Chute teste: %s\n", buf);
     }
-// nao eh possivel fazer gol, inserir filosofo aleatorio
+  // nao eh possivel fazer gol, inserir filosofo aleatorio
     else{
+      // verifica se ha espaco vazio em campo para filosofo
+      espaco_vazio = -1;
+      for (i = 0; i < tam_campo; i++){
+        if (campo[i] == '.') espaco_vazio = i;
+      } 
+      // se nao ha espaco, enviar mensagem de fazer nada
+      if (espaco_vazio == -1){
+        sprintf(buf, "%c n\n", lado_meu);
+      }
+      // se ha espaco
       // prepara um string com o movimento
       // de inserir um filosofo em posicao aleatoria do campo
-      rand_pos = (rand() % tam_campo) + 1;
-      sprintf(buf, "%c f %d\n", lado_meu, rand_pos);
+      else{
+        rand_pos = (rand() % tam_campo);
+        while (campo[rand_pos] != '.'){
+          rand_pos = (rand() % tam_campo);
+        }
+        sprintf(buf, "%c f %d\n", lado_meu, rand_pos + 1);
+      }
     }
     // envia o movimento para o controlador do campo
+    printf("Msg enviada: %s\n", buf);
     campo_envia(buf);  
   }
 }
