@@ -148,6 +148,16 @@ int main(int argc, char **argv) {
 
   sprintf(buf, "%c %d %s\n%c n\n", lado, tam, campo, OUTRO(lado));
 
+
+  // Limpa movimentos de jogos anteriores antes de comecar 
+  sprintf(key, "mov_d");
+  r = redisCommand(c, "DEL %s", key);
+  freeReplyObject(r);
+  sprintf(key, "mov_e");
+  r = redisCommand(c, "DEL %s", key);
+  freeReplyObject(r);
+
+  // Comeca jogo efetivamente
   while(jogadas) {
     sprintf(key, "campo_%c", lado);
     r = redisCommand(c, "LTRIM %s 1 0", key);
@@ -198,4 +208,6 @@ int main(int argc, char **argv) {
     printf("empate\n");
   else    
     printf("vencedor: %c\n", vencedor);
+
+  redisFree(c);
 }
