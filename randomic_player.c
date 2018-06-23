@@ -72,11 +72,16 @@ int main(int argc, char **argv) {
     printf("\n");
 */
 
+    pos_bola2 = -1;
     for (i = 0; i < tam_campo; i++){
 //      printf("%c ", campo[i]);
       if (campo[i] == 'o'){
          pos_bola2 = i;
       }
+    }
+    if (pos_bola2 == -1){
+      printf("Jogo encerrado\n");
+      continue;
     }
 //    printf("\n");
 
@@ -154,6 +159,8 @@ int main(int argc, char **argv) {
           sprintf(num, "%d ", chutes_dir[i]);
           strcat(buf, num);
         }
+      sprintf(num, "\n");
+      strcat(buf, num);
     }
     else if (lado_meu == 'd' && gol_esq == 1){
 //      chutar_gol_esq
@@ -162,6 +169,8 @@ int main(int argc, char **argv) {
           sprintf(num, "%d ", chutes_esq[i]);
           strcat(buf, num);
         }
+      sprintf(num, "\n");
+      strcat(buf, num);
     }
   // nao eh possivel fazer gol, inserir filosofo aleatorio
     else{
