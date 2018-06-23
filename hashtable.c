@@ -17,20 +17,21 @@ thashtable * h_init(int table_s){
 */
 int h_genkey(char * state, int table_s){
   int key = 0;
-  int field_size = ((int) strlen(state)) - 1;
+  int field_size = ((int) strlen(state)) - 2;
   char lado = state[field_size + 1];
   for (int i = 0; i < field_size; i++){
     if (state[i] == 'f'){
-      key += i;
+      key = key + i;
     }
     else if (state[i] == 'o'){
-      key += (2 * i);
+      key = key + (2 * i);
     }
   }
   if (lado == 'e'){
-    key = ~key;
+    key = key *2;
   }
-  key = key % table_s;
+  if (key < table_s) return key;
+  else return key % table_s;
 }
 // Insere estado na tabela hash
 void h_insert(thashtable *hash, char * state){
@@ -49,7 +50,10 @@ thead * h_getlist(thashtable *hash, int key){
 int h_findstate(thashtable * hash, char * state){
   int key = h_genkey(state, hash->table_size);
   thead * list = h_getlist(hash, key);
-  return l_search(list, state);
+  if (list != NULL){
+    return l_search(list, state);
+  }
+  else return 0;
 }
 
 // Limpa da memoria a tabela hash
