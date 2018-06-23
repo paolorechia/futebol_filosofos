@@ -34,14 +34,24 @@ int h_genkey(char * state, int table_s){
   else return key % table_s;
 }
 // Insere estado na tabela hash
-void h_insert(thashtable *hash, char * state){
+int h_insert(thashtable *hash, char * state){
   int key = h_genkey(state, hash->table_size);
   thead * list = h_getlist(hash, key);
+  // se a chave ainda nao existe, estado eh novo, inserir
   if (list== NULL){
     list = l_init();
     hash->table_p[key] = list;
+    l_insert(list, state); 
+    return 0;
   }
-  l_insert(list, state); 
+  // se a chave ja existe, buscar na lista da chave
+  else{
+    // se encontrou na lista, estado ja existe, abortar
+    if ((l_search(list, state)) == 1) return 1;
+    // senao, estado novo, inserir
+    l_insert(list, state);
+    return 0;
+  }
 }
 thead * h_getlist(thashtable *hash, int key){
   return hash->table_p[key];
@@ -82,10 +92,33 @@ int main(){
   printf("%d\n", h_genkey("f.f......fd", table_size));
 
   printf("Testando insercao \n");
-  h_insert(hash, "f.f.......fe");
-  h_insert(hash, "f.f.o.....fe");
-  h_insert(hash, "f.f...f...fd");
-  h_insert(hash, "f.f.....f.fd");
+  printf("Elementos novos\n");
+  if (h_insert(hash, "f.f.......fe")){
+    printf("Elemento ja existe, impossivel inserir\n");
+  }
+  if (h_insert(hash, "f.f.o.....fe")){
+    printf("Elemento ja existe, impossivel inserir\n");
+  }
+ if ( h_insert(hash, "f.f...f...fd")){
+    printf("Elemento ja existe, impossivel inserir\n");
+  }
+  if (h_insert(hash, "f.f.....f.fd")){
+    printf("Elemento ja existe, impossivel inserir\n");
+  }
+
+  printf("Elementos existentes \n");
+  if (h_insert(hash, "f.f.......fe")){
+    printf("Elemento ja existe, impossivel inserir\n");
+  }
+  if (h_insert(hash, "f.f.o.....fe")){
+    printf("Elemento ja existe, impossivel inserir\n");
+  }
+  if (h_insert(hash, "f.f...f...fd")){
+    printf("Elemento ja existe, impossivel inserir\n");
+  }
+  if (h_insert(hash, "f.f.....f.fd")){
+    printf("Elemento ja existe, impossivel inserir\n");
+  }
 
   printf("Testando busca\n");
   printf("%d\n", h_findstate(hash, "f.f.......fe"));

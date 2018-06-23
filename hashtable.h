@@ -16,7 +16,7 @@ thashtable * h_init(int table_s);
 // Funcao hash: traduz o estado para uma chave
 int h_genkey(char * state, int table_s);
 // Insere estado na tabela hash
-void h_insert(thashtable * hash, char * state);
+int h_insert(thashtable * hash, char * state);
 // Retorna a lista encadeada onde o estado pode estar
 thead * h_getlist(thashtable * hash, int key);
 // Verifica se estado esta na tabela hash
