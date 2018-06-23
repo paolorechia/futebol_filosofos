@@ -1,14 +1,13 @@
+#include "list.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <graphviz/cgraph.h>
-#include "grafo.h"
 
 /*************************************************/
 /* Estrutura de dados auxiliar - lista encadeada */
 /*************************************************/
 //Funçao que inicializa a lista usada para achar a diferença e a interseccao.
-static thead * l_init(){
+ thead * l_init(){
     thead * head = malloc(sizeof(thead));
     head->node = malloc(sizeof(tnode));
     head->node->nxt = NULL;
@@ -18,7 +17,7 @@ static thead * l_init(){
 }
 
 //Funçao usada para inserir os chars (vizinhança) na lista daquele vertice.
-static void l_insert(thead * head, char * new){
+ void l_insert(thead * head, char * new){
     tnode * node = head->node;
     while (node->nxt != NULL){
         node = node -> nxt;
@@ -31,7 +30,7 @@ static void l_insert(thead * head, char * new){
 }
 
 //Funçao auxiliar para ajudar a debugar o programa.
-static void l_print(thead * head){
+ void l_print(thead * head){
     printf("--------->"); 
     if (head->node->nxt == NULL){
         printf("Empty l\n");
@@ -45,12 +44,12 @@ static void l_print(thead * head){
     putchar('\n');
 }
 
-static int l_size(thead * head){
+ int l_size(thead * head){
     return head->size;
 }
 
 /* Funcao recursiva para limpar lista a partir do ultimo no*/
-static int rec_clear(tnode * node){
+ int rec_clear(tnode * node){
     if (node->nxt != NULL){
         rec_clear(node->nxt);
     }
@@ -61,7 +60,7 @@ static int rec_clear(tnode * node){
 }
 
 //Funçao para limpar a lista.
-static int l_clear(thead * head){
+ int l_clear(thead * head){
     tnode * node = head->node;
     if (head->node->nxt == NULL){
         return 0;
@@ -73,13 +72,13 @@ static int l_clear(thead * head){
 }
 
 // Desaloca memoria
-static void l_free(thead *head){
+ void l_free(thead *head){
     l_clear(head);
     free(head->node);
     free(head);
 }
 // Busca sequencial de elemento na lista
-static int l_search(thead* head, char * buscado){
+ int l_search(thead* head, char * buscado){
     // if empty list
     if (head->node->nxt == NULL){
         return 0;
@@ -92,7 +91,7 @@ static int l_search(thead* head, char * buscado){
     return 0;
 }
 //Funcao que verifica a interseccao entre os dois vertives.
-static thead * l_intersection(thead *l1, thead * l2){
+ thead * l_intersection(thead *l1, thead * l2){
     thead * inter_l = l_init();
     // if either list is empty, intersection is empty
     if (l1->node->nxt == NULL || l2->node->nxt == NULL){
@@ -110,7 +109,7 @@ static thead * l_intersection(thead *l1, thead * l2){
 }
 
 // cria uma copia da lista
-static thead * l_copy(thead *list)
+ thead * l_copy(thead *list)
 {
     // No auxiliar
     thead* new_list = l_init();
