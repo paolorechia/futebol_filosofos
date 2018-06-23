@@ -12,7 +12,6 @@ typedef struct node_list{
   int size;
 } t_list;
 
-// Define um no externo, com um no interno e uma lista de nos (filhos)
 typedef struct no{
   char * estado;
   char acao[20];
@@ -40,7 +39,6 @@ static t_list* tl_init();
 //Funçao usada para inserir os chars (vizinhança) na lista daquele vertice.
 static void tl_insert(t_list * list, tno * no);
 //Funçao auxiliar para ajudar a debugar o programa.
-static void tl_print(t_list * list);
 static int tl_size(t_list * list);
 /* Funcao recursiva para limpar lista a partir do ultimo no*/
 static int rec_clear(node * no);
@@ -49,6 +47,5 @@ static int tl_clear(t_list * list);
 // Desaloca memoria
 static void tl_free(t_list *list);
 // Busca sequencial de elemento na lista
-static int tl_search(t_list* list, tno * no);
 
 #endif

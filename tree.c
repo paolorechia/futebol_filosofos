@@ -4,6 +4,7 @@
 #include <string.h>
 #include "tabelahash.h"
 
+/* Arvore */
 tno * aloca_no(char * estado, thashtable * hash,
                    int lim, int prof,
                    tno * pai)
@@ -64,10 +65,7 @@ int * devolve_acao_caminho(tno * no){
     return aux2->acao;
 }
 
-/*************************************************/
-/* Estrutura de dados auxiliar - lista encadeada */
-/*************************************************/
-//Funçao que inicializa a lista usada para achar a diferença e a interseccao.
+/* Lista Encadeada */
  t_list * tl_init(){
     t_list * head = malloc(sizeof(t_list));
     head->node = malloc(sizeof(tnode));
@@ -77,33 +75,18 @@ int * devolve_acao_caminho(tno * no){
     return head;
 }
 
-//Funçao usada para inserir os chars (vizinhança) na lista daquele vertice.
+// Insere novo no na lista
  void tl_insert(t_list * head, tno * no){
     tnode * node = head->node;
     while (node->nxt != NULL){
         node = node -> nxt;
     }
     node->nxt=malloc(sizeof(tnode));
-//    strcpy(node->nxt->key,new);
+    node->no_atual = no;
     node->nxt-> 
     node->nxt->nxt=NULL;
     head->size += 1;
     return;
-}
-
-//Funçao auxiliar para ajudar a debugar o programa.
- void tl_print(t_list * head){
-    printf("--------->"); 
-    if (head->node->nxt == NULL){
-        printf("Empty l\n");
-        return;
-    }
-    tnode * node = head->node->nxt;
-    while (node){
-        printf("%s ", node->key);
-        node = node->nxt;
-    }
-    putchar('\n');
 }
 
  int tl_size(t_list * head){
@@ -139,51 +122,3 @@ int * devolve_acao_caminho(tno * no){
     free(head->node);
     free(head);
 }
-// Busca sequencial de elemento na lista
- int tl_search(t_list* head, char * buscado){
-    // if empty list
-    if (head->node->nxt == NULL){
-        return 0;
-    }
-    tnode * node = head->node->nxt;
-    while (node){
-        if (!strcmp(node->key, buscado)) return 1;
-        node = node->nxt;
-    }   
-    return 0;
-}
-//Funcao que verifica a interseccao entre os dois vertives.
- t_list * tl_intersection(t_list *l1, t_list * l2){
-    t_list * inter_l = tl_init();
-    // if either list is empty, intersection is empty
-    if (l1->node->nxt == NULL || l2->node->nxt == NULL){
-        return inter_l;
-    } 
-    // fetch first element
-    tnode * node = l1->node->nxt;
-    while (node){
-        if (tl_search(l2, node->key)){
-            tl_insert(inter_l, node->key);
-        }
-        node = node->nxt;
-    }
-    return inter_l;
-}
-
-// cria uma copia da lista
- t_list * tl_copy(t_list *list)
-{
-    // No auxiliar
-    t_list* new_list = tl_init();
-    tnode * lnode = list->node->nxt;
-    while (lnode)
-    {
-        tl_insert(new_list, lnode->key); // Insere chave na lista nova
-        lnode = lnode->nxt;         // Proximo elemento da lista
-    }
-    return new_list; //Return de head of the copy.
-}
-
-/*************************************************/
-/* Fim da estrutura de dados lista encadeada     */
-/*************************************************/
