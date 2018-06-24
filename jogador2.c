@@ -8,7 +8,7 @@
 #define MAXCHT MAXSTR/2
 #define MAXINT 16
 
-int testa_chutes_esq(char * campo, int * chutes_esq[MAXCHT],
+int testa_chutes_esq(char * campo, int ** chutes_esq,
                      int * num_chutes_esq, int pos_bola2){
     // testa lado esquerdo
     int gol_esq = 0;
@@ -17,8 +17,8 @@ int testa_chutes_esq(char * campo, int * chutes_esq[MAXCHT],
     if (campo[j] == 'f'){ // eh possivel um chute
       while (j > 0){
           if (campo[j] == '.'){
-            chutes_esq[*num_chutes_esq]=j + 1;
-            *num_chutes_esq++;
+            *chutes_esq[*num_chutes_esq]=j + 1;
+            *num_chutes_esq = *num_chutes_esq + 1;
             if (campo[j - 1] == '.'){
               break; // nao ha mais chutes possiveis
             }
@@ -27,8 +27,8 @@ int testa_chutes_esq(char * campo, int * chutes_esq[MAXCHT],
       }
     }
     if (j == 0 && campo[0] == 'f'){
-      chutes_esq[*num_chutes_esq]=j;
-      *num_chutes_esq++;
+      *chutes_esq[*num_chutes_esq]=j;
+      *num_chutes_esq = *num_chutes_esq + 1;
       gol_esq = 1;
     }
    return gol_esq;
@@ -44,8 +44,8 @@ int testa_chutes_dir(char * campo, int tam_campo,
     if (campo[j] == 'f'){ // eh possivel um chute
       while (j < tam_campo){
           if (campo[j] == '.'){
-            chutes_dir[*num_chutes_dir]= j + 1;
-            *num_chutes_dir++;
+            *chutes_dir[*num_chutes_dir]= j + 1;
+            *num_chutes_dir = *num_chutes_dir + 1;
             if (campo[j + 1] == '.'){
               break; // nao ha mais chutes possiveis
             }
@@ -54,15 +54,15 @@ int testa_chutes_dir(char * campo, int tam_campo,
       }
     }
     if (j == tam_campo && campo[tam_campo - 1] == 'f'){
-      chutes_dir[*num_chutes_dir]=j + 1;
-      *num_chutes_dir++;
+      *chutes_dir[*num_chutes_dir]=j + 1;
+      *num_chutes_dir = *num_chutes_dir + 1;
       gol_dir = 1;
     }
     return gol_dir;
 }
 void faz_gol(int * chutes, int num_chutes, char lado_jogador){
     char buf[MAXSTR];
-    char num[20];
+    char num[MAXINT];
     sprintf(buf, "%c o %d ", lado_jogador, num_chutes);
     for (int i = 0; i < num_chutes; i++){
         sprintf(num, "%d ", chutes[i]);
@@ -74,7 +74,7 @@ void faz_gol(int * chutes, int num_chutes, char lado_jogador){
 }
 void gera_chutes(int * chutes, int num_chutes){
     char buf[MAXSTR];
-    char num[20];
+    char num[MAXINT];
     if (num_chutes > 0){
       sprintf(buf, "");
       for (int i = 0; i < num_chutes; i++){
@@ -111,10 +111,8 @@ void gera_acoes(char * campo, int tam_campo, char lado){
     int num_chutes_dir;
     int gol_esq;
     int gol_dir;
-    int i, j;
-    int espaco_vazio;
-    int chutes_esq[MAXCHT];
-    int chutes_dir[MAXCHT];
+    int * chutes_esq = malloc(sizeof(int) * MAXCHT);
+    int * chutes_dir = malloc(sizeof(int) * MAXCHT);
     // acha bola
     pos_bola2 = acha_bola(campo, tam_campo);
     if (pos_bola2 == -1){
@@ -140,6 +138,8 @@ void gera_acoes(char * campo, int tam_campo, char lado){
     }
   }
 */
+    free(chutes_esq);
+    free(chutes_dir);
 }
 int main(int argc, char **argv) {
 
@@ -148,13 +148,11 @@ int main(int argc, char **argv) {
   char lado_meu;
   char lado_adv;
   char mov_adv;
-  char num[MAXINT];
   int tam_campo;
   int pos_filo;
   int pos_bola[MAXINT];
   int num_saltos;
   int i;
-  int j;
 
   // conecta com o controlador do campo
   campo_conecta(argc, argv);
@@ -179,8 +177,8 @@ int main(int argc, char **argv) {
       }
     }
     gera_acoes(campo, tam_campo, lado_meu);
-    printf("%s\n", buf);
     sprintf(buf, "%c n\n", lado_meu);
+    printf("%s\n", buf);
     campo_envia(buf);  
   }
 }
