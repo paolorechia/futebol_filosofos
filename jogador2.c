@@ -175,60 +175,6 @@ void gera_acoes(tno * state_tree, thashtable * hash,
     free(chutes_dir);
 }
 
-int f_utilidade2(tno * atual, char jogador){
-  // le campo e lado do estado
-  char campo[MAXSTR];
-  strcpy(campo, atual->estado);
-  int tam_campo = strlen(campo);
-  char lado = campo[tam_campo -1];
-  campo[tam_campo - 1]='\0';
-  tam_campo--;
-
-  int multiplicador;
-  if (jogador == lado)
-    multiplicador = 1;
-  else multiplicador = -1;
-
-  // Jogo encerrado
-  if (atual->terminal == 1){
-    if (atual->gol == jogador)
-      return -1000;
-    else if (atual->gol == 'e' || atual->gol == 'd')
-       return 1000;
-  }
-
-  int pos_bola2;
-  int num_chutes_esq = 0;
-  int num_chutes_dir = 0;
-  int gol_esq;
-  int gol_dir;
-  int * chutes_esq = malloc(sizeof(int) * MAXCHT);
-  int * chutes_dir = malloc(sizeof(int) * MAXCHT);
-  int valor = 0;
-  // acha bola
-  pos_bola2 = acha_bola(campo, tam_campo);
-  if (pos_bola2 == -1){
-//    printf("Jogo encerrado\n");
-    free(chutes_esq);
-    free(chutes_dir);
-    return valor;
-  }
-  // testar se eh possivel chutar ao gol para algum lado
-  gol_esq = testa_chutes_esq(campo, &chutes_esq, &num_chutes_esq, pos_bola2);
-  gol_dir = testa_chutes_dir(campo, tam_campo, &chutes_dir, &num_chutes_dir, pos_bola2);
-  if (lado == 'd'){
-    if (gol_esq) valor = tam_campo*10;
-    if (gol_dir) valor = -tam_campo*10;
-  }
-  else{
-    if (gol_esq) valor = -tam_campo*10;
-    if (gol_dir) valor = tam_campo*10;
-  }
-  free(chutes_esq);
-  free(chutes_dir);
-  return multiplicador * valor;
-}
-
 int f_utilidade(tno * atual, char jogador){
   // le campo e lado do estado
   char campo[MAXSTR];
@@ -382,7 +328,7 @@ int main(int argc, char **argv) {
   int pos_bola[MAXINT];
   int num_saltos;
   int i;
-  int limite_arvore = 5;
+//  int limite_arvore = 5;
   
 
   // conecta com o controlador do campo
