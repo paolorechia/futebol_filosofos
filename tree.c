@@ -15,6 +15,7 @@ tno * aloca_no(char * estado, thashtable * hash,
     tno * no;
     no = malloc(sizeof(tno));
     no->estado = malloc(sizeof(estado) * strlen(estado));
+    strcpy(no->estado, estado);
     no->profundidade = prof;
     no->limite = lim;
     no->pai = pai;

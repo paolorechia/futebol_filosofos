@@ -9,6 +9,9 @@ thashtable * h_init(int table_s){
   thashtable * hash = malloc(sizeof(thashtable));
   hash->table_size = table_s;
   hash->table_p = (thead **) malloc(sizeof(thead) * table_s);
+  for (int i = 0; i < table_s; i++){
+    hash->table_p[i] = NULL;
+  }
   return hash;
 }
 // Funcao hash: traduz o estado para uma chave

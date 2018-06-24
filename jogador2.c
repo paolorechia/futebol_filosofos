@@ -150,18 +150,17 @@ void minimax(tno * state_tree, thashtable * hash){
     return;
   }
   l_node * no = state_tree->filhos->head->nxt;
-   
   while (no){
     tno * atual = (tno *) no->no_atual;
     if (atual->profundidade < atual->limite){
       char campo[MAXSTR];
       strcpy(campo, atual->estado);
       int tam_campo = strlen(campo);
-      campo[tam_campo]='\0';
-      if (atual->estado[tam_campo] == 'd')
-        gera_acoes(state_tree, hash, campo, tam_campo -1, 'e');
+      campo[tam_campo - 1]='\0';
+      if (atual->estado[tam_campo - 1] == 'd')
+        gera_acoes(atual, hash, campo, tam_campo -2, 'e');
       else
-        gera_acoes(state_tree, hash, campo, tam_campo -1, 'd');
+        gera_acoes(atual, hash, campo, tam_campo -2, 'd');
       minimax(atual, hash);
       no = no->nxt;
     }
@@ -216,7 +215,7 @@ int main(int argc, char **argv) {
     tno * state_tree = aloca_raiz(estado_atual, hash, limite_arvore);
     gera_acoes(state_tree, hash, campo, tam_campo, lado_meu);
     minimax(state_tree, hash);
-//    sprintf(buf, "%c n\n", lado_meu);
+    sprintf(buf, "%c n\n", lado_meu);
 //    printf("%s\n", buf);
     campo_envia(buf);  
     // Libera da memoria as estruturas auxiliares
