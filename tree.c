@@ -2,12 +2,13 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
-#include "tabelahash.h"
+#include "tree.h"
+#include "hashtable.h"
 
 /* Arvore */
 tno * aloca_no(char * estado, thashtable * hash,
                    int lim, int prof,
-                   tno * pai)
+                   tno * pai){
     if (h_insert(hash, estado)){
       return NULL;
     }
@@ -21,19 +22,19 @@ tno * aloca_no(char * estado, thashtable * hash,
     return no;
 }
 
-tno * aloca_raiz(char * estado, thashtable * hash, int lim)
+tno * aloca_raiz(char * estado, thashtable * hash, int lim){
     return aloca_no(estado, hash, lim, 0, NULL);
 }
 
-tno * aloca_filho(tno * no_pai){
+tno * aloca_filho(tno * no_pai, char * estado, thashtable * hash){
     if (no_pai->filhos == NULL){
       no_pai->filhos=tl_init();
     }
     int lim = no_pai->limite;
     int prof= no_pai->profundidade++;
-    tno * filho = aloca_no(estado, hash, lim, prof, no_pai)
+    tno * filho = aloca_no(estado, hash, lim, prof, no_pai);
     if (filho != NULL){
-      tl_insert(no->pai->filhos, filho);
+      tl_insert(no_pai->filhos, filho);
     }
     return filho;
 }
@@ -47,15 +48,15 @@ void desaloca_no(tno * no){
 }
 
 void desaloca_arvore(tno * no){
-    tno * filho = no->filhos->nxt;
+    tno * filho = (tno *) no->filhos->head->nxt->no_atual;
     while (filho){
       desaloca_arvore(filho);
-      filho = no->filhos->nxt;
+      filho = (tno *) no->filhos->head->nxt->no_atual;
     }
     desaloca_no(no);
 }
 
-int * devolve_acao_caminho(tno * no){
+char * devolve_acao_caminho(tno * no){
     tno * aux2 = no;
     tno * aux = no->pai;
     while(aux->pai){
@@ -67,36 +68,35 @@ int * devolve_acao_caminho(tno * no){
 
 /* Lista Encadeada */
  t_list * tl_init(){
-    t_list * head = malloc(sizeof(t_list));
-    head->node = malloc(sizeof(tnode));
-    head->node->nxt = NULL;
-    head->size = 0;
-    head->node = NULL;
-    return head;
+    t_list * list = malloc(sizeof(t_list));
+    list->head = malloc(sizeof(l_node));
+    list->head->nxt = NULL;
+    list->size = 0;
+    list->head = NULL;
+    return list;
 }
 
 // Insere novo no na lista
- void tl_insert(t_list * head, tno * no){
-    tnode * node = head->node;
+ void tl_insert(t_list * list, tno * no){
+    l_node * node = list->head;
     while (node->nxt != NULL){
-        node = node -> nxt;
+        node = node->nxt;
     }
-    node->nxt=malloc(sizeof(tnode));
-    node->no_atual = no;
-    node->nxt-> 
+    node->nxt=malloc(sizeof(l_node));
+    node->nxt->no_atual = (void *) no;
     node->nxt->nxt=NULL;
-    head->size += 1;
+    list->size += 1;
     return;
 }
 
- int tl_size(t_list * head){
+int tl_size(t_list * head){
     return head->size;
 }
 
 /* Funcao recursiva para limpar lista a partir do ultimo no*/
- int rec_clear(tnode * node){
+ int tl_rec_clear(l_node * node){
     if (node->nxt != NULL){
-        rec_clear(node->nxt);
+        tl_rec_clear(node->nxt);
     }
 //    printf("Freeing node of name: %s\n", node->key);
     node->nxt = NULL;
@@ -105,20 +105,20 @@ int * devolve_acao_caminho(tno * no){
 }
 
 //Funçao para limpar a lista.
- int tl_clear(t_list * head){
-    tnode * node = head->node;
-    if (head->node->nxt == NULL){
+ int tl_clear(t_list * list){
+    l_node * node = list->head;
+    if (node->nxt == NULL){
         return 0;
     }
-    rec_clear(head->node->nxt);
-    head->node->nxt = NULL;
-    head->size = 0;
+    tl_rec_clear(node->nxt);
+    list->head->nxt = NULL;
+    list->size = 0;
     return 1;
 }
 
 // Desaloca memoria
- void tl_free(t_list *head){
-    tl_clear(head);
-    free(head->node);
-    free(head);
+ void tl_free(t_list * list){
+    tl_clear(list);
+    free(list->head);
+    free(list);
 }

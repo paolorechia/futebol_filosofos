@@ -78,7 +78,7 @@ void h_free(thashtable * hash){
 }
 
 
-
+/*
 int main(){
   int table_size = 20;
   printf("Testando init... \n");
@@ -134,3 +134,4 @@ int main(){
   printf("Testando free\n");
   h_free(hash);
 }
+*/

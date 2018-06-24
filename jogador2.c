@@ -3,6 +3,8 @@
 #include <string.h>
 #include <time.h>
 #include "campo.h"
+#include "hashtable.h"
+#include "tree.h"
 
 #define MAXSTR 512
 #define MAXCHT MAXSTR/2

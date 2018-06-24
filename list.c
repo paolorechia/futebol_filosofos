@@ -61,7 +61,7 @@
 
 //Funçao para limpar a lista.
  int l_clear(thead * head){
-    tnode * node = head->node;
+//    tnode * node = head->node;
     if (head->node->nxt == NULL){
         return 0;
     }
