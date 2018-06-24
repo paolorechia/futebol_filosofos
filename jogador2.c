@@ -91,12 +91,20 @@ void gera_chutes(int * chutes, int num_chutes, char lado_jogador){
     }
 }
 
-void coloca_filosofo(char * campo, int tam_campo, char meu_lado){
-    char buf[MAXSTR] = "";
+void coloca_filosofo(tno * state_tree, thashtable * hash, 
+                     char * campo, int tam_campo, char meu_lado){
+    char estado_novo[MAXSTR];
+    strcpy(estado_novo, campo);
     for (int i = 0; i < tam_campo; i++){
       if (campo[i] == '.'){
-        sprintf(buf, "%c f %d\n", meu_lado, i);
-        printf("%s", buf);
+        estado_novo[i] = 'f';
+        sprintf(estado_novo, "%s%c", estado_novo, meu_lado);
+        tno * novo_no = aloca_filho(state_tree, estado_novo, hash);
+        if (novo_no != NULL){
+          sprintf(novo_no->acao, "%c f %d\n", meu_lado, i);
+//          printf("%s", novo_no->acao);
+        }
+        strcpy(estado_novo, campo);
       }
     }
 }
@@ -110,7 +118,8 @@ int acha_bola(char * campo, int tam_campo){
     return pos_bola2;
 }
 
-void gera_acoes(char * campo, int tam_campo, char lado){
+void gera_acoes(tno * state_tree, thashtable * hash, 
+                char * campo, int tam_campo, char lado){
     int pos_bola2;
     int num_chutes_esq;
     int num_chutes_dir;
@@ -131,7 +140,7 @@ void gera_acoes(char * campo, int tam_campo, char lado){
     else gera_chutes(chutes_esq, num_chutes_esq, lado);
     if (gol_dir && lado == 'e') faz_gol(chutes_dir, num_chutes_dir, lado);
     else gera_chutes(chutes_dir, num_chutes_dir, lado);
-    coloca_filosofo(campo, tam_campo, lado);
+    coloca_filosofo(state_tree, hash, campo, tam_campo, lado);
     free(chutes_esq);
     free(chutes_dir);
 }
@@ -154,7 +163,7 @@ int main(int argc, char **argv) {
   campo_conecta(argc, argv);
 
   srand(time(NULL));
-//  while(1){
+  while(1){
     // recebe o campo inicial e o movimento do adversario
     campo_recebe(buf);
     // separa os elementos do string recebido
@@ -177,12 +186,12 @@ int main(int argc, char **argv) {
     strcpy(estado_atual, campo);
     sprintf(estado_atual, "%s%c", estado_atual, lado_meu);
     tno * state_tree = aloca_raiz(estado_atual, hash, limite_arvore);
-    gera_acoes(campo, tam_campo, lado_meu);
+    gera_acoes(state_tree, hash, campo, tam_campo, lado_meu);
     sprintf(buf, "%c n\n", lado_meu);
     printf("%s\n", buf);
     campo_envia(buf);  
     // Libera da memoria as estruturas auxiliares
     h_free(hash);
-    desaloca_arvore(state_tree);
-//  }
+//    desaloca_arvore(state_tree);
+  }
 }

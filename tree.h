@@ -3,6 +3,8 @@
 
 #include "hashtable.h"
 
+#define MAXSTR 512
+
 // Define uma lista de nos
 typedef struct list_cell{
     void * no_atual;
@@ -16,7 +18,7 @@ typedef struct node_list{
 
 typedef struct no{
   char * estado;
-  char acao[20];
+  char acao[MAXSTR];
   int util; 
   int profundidade;
   int limite;

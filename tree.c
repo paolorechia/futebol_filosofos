@@ -40,10 +40,7 @@ tno * aloca_filho(tno * no_pai, char * estado, thashtable * hash){
 }
 
 void desaloca_no(tno * no){
-    free(no->estado);
-    if (no->filhos != NULL){
-      tl_free(no->filhos);
-    }
+    tl_free(no->filhos);
     free(no);
 }
 
@@ -52,13 +49,13 @@ void desaloca_arvore(tno * no){
       return;
     }
     if (no->filhos == NULL){
-        desaloca_no(no);
-        return;
-      }
-    tno * filho = (tno *) no->filhos->head->nxt->no_atual;
+      desaloca_no(no);
+      return;
+    }
+    l_node * filho = no->filhos->head->nxt;
     while (filho){
-      desaloca_arvore(filho);
-      filho = (tno *) no->filhos->head->nxt->no_atual;
+      desaloca_arvore(filho->no_atual);
+      filho = filho->nxt;
     }
     desaloca_no(no);
 }
@@ -79,7 +76,6 @@ char * devolve_acao_caminho(tno * no){
     list->head = malloc(sizeof(l_node));
     list->head->nxt = NULL;
     list->size = 0;
-    list->head = NULL;
     return list;
 }
 
@@ -125,6 +121,9 @@ int tl_size(t_list * head){
 
 // Desaloca memoria
  void tl_free(t_list * list){
+    if (list == NULL){
+      return;
+    }
     tl_clear(list);
     free(list->head);
     free(list);
