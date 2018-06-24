@@ -1,8 +1,9 @@
 /*************************************************/
 /* Estrutura de dados auxiliar - lista encadeada */
 /*************************************************/
+#define MAXSTR 512
 typedef struct cel_struct{
-    char key[48];
+    char key[MAXSTR];
     struct cel_struct * nxt;
 } tnode;
 
