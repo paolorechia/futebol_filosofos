@@ -238,10 +238,13 @@ int f_utilidade(tno * atual, char jogador){
   campo[tam_campo - 1]='\0';
   tam_campo--;
 
+  int multiplicador = 1;
+/*
   int multiplicador;
   if (jogador == lado)
     multiplicador = 1;
   else multiplicador = -1;
+*/
 
   // Jogo encerrado
   if (atual->terminal == 1){
@@ -308,6 +311,7 @@ int valor_max(tno * state_tree, thashtable * hash, char jogador){
       no = no->nxt;
   printf("%d %s %d\n (max)", atual->profundidade, atual->estado, f_utilidade(atual, jogador));
   }
+  state_tree->util = max;
   printf("%d %s %d\n (MAX)", state_tree->profundidade, state_tree->estado, f_utilidade(state_tree, jogador));
   return max;
 }
@@ -334,6 +338,7 @@ int valor_min(tno * state_tree, thashtable * hash, char jogador){
       no = no->nxt;
   printf("%d %s %d\n (min)", atual->profundidade, atual->estado, f_utilidade(atual, jogador));
   }
+  state_tree->util = min;
   printf("%d %s %d\n (MIN)", state_tree->profundidade, state_tree->estado, f_utilidade(state_tree, jogador));
   return min;
 }
@@ -357,7 +362,7 @@ char * minimax2(tno * state_tree, thashtable * hash, char jogador){
         gera_acoes(atual, hash, campo, tam_campo -2, 'e');
       else
         gera_acoes(atual, hash, campo, tam_campo -2, 'd');
-      int v = valor_min(atual, hash, jogador);
+      int v = valor_max(atual, hash, jogador);
       if (v > max) {
         max = v;
         maximo = atual;
@@ -377,8 +382,11 @@ int minimax(tno * state_tree, thashtable * hash, char jogador){
     return;
   }
 */
+  if (state_tree == NULL){
+    return;
+  }
   if (state_tree->profundidade >= state_tree->limite || state_tree->terminal == 1){
-    printf("%s %d\n", state_tree->estado, f_utilidade(state_tree, jogador));
+    printf("TERMINAL: %s %d\n", state_tree->estado, f_utilidade(state_tree, jogador));
     return f_utilidade(state_tree, jogador);
   }
   else{
@@ -398,8 +406,10 @@ int minimax(tno * state_tree, thashtable * hash, char jogador){
         int v = minimax(atual, hash, jogador);
         if (v > max) max = v;
         no = no->nxt;
+        printf("%d %s %d\n", atual->profundidade, atual->estado, f_utilidade(atual, jogador));
     }
     state_tree->util = max;
+//    printf("(max)%d %s %d\n", state_tree->profundidade, state_tree->util, f_utilidade(state_tree, jogador));
     return max;
   }
 }
@@ -467,12 +477,14 @@ int main(int argc, char **argv) {
     sprintf(estado_atual, "%s%c", estado_atual, lado_meu);
     tno * state_tree = aloca_raiz(estado_atual, hash, limite_arvore);
     gera_acoes(state_tree, hash, campo, tam_campo, lado_meu);
-//    minimax(state_tree, hash, lado_meu);
-    char * acao = minimax2(state_tree, hash, lado_meu);
-//    printf("%d\n", state_tree->util);
-//    sprintf(buf, "%s", acao_max(state_tree));
-    printf("%s", acao);
-    campo_envia(acao);
+    minimax(state_tree, hash, lado_meu);
+//    char * acao = minimax2(state_tree, hash, lado_meu);
+    printf("%d\n", state_tree->util);
+    sprintf(buf, "%s", acao_max(state_tree));
+//    printf("%s", acao);
+//    campo_envia(acao);
+    campo_envia(buf);
+    printf("%s", buf);
     // Libera da memoria as estruturas auxiliares
     h_free(hash);
     desaloca_arvore(state_tree);
