@@ -48,6 +48,13 @@ void desaloca_no(tno * no){
 }
 
 void desaloca_arvore(tno * no){
+    if (no == NULL){
+      return;
+    }
+    if (no->filhos == NULL){
+        desaloca_no(no);
+        return;
+      }
     tno * filho = (tno *) no->filhos->head->nxt->no_atual;
     while (filho){
       desaloca_arvore(filho);

@@ -147,12 +147,14 @@ int main(int argc, char **argv) {
   int pos_bola[MAXINT];
   int num_saltos;
   int i;
+  int limite_arvore = 3;
+  
 
   // conecta com o controlador do campo
   campo_conecta(argc, argv);
 
   srand(time(NULL));
-  while(1){
+//  while(1){
     // recebe o campo inicial e o movimento do adversario
     campo_recebe(buf);
     // separa os elementos do string recebido
@@ -170,9 +172,17 @@ int main(int argc, char **argv) {
       sscanf(strtok(NULL, " \n"), "%d", &(pos_bola[i]));
       }
     }
+    thashtable * hash = h_init(MAXSTR);
+    char estado_atual[MAXSTR];
+    strcpy(estado_atual, campo);
+    sprintf(estado_atual, "%s%c", estado_atual, lado_meu);
+    tno * state_tree = aloca_raiz(estado_atual, hash, limite_arvore);
     gera_acoes(campo, tam_campo, lado_meu);
     sprintf(buf, "%c n\n", lado_meu);
     printf("%s\n", buf);
     campo_envia(buf);  
-  }
+    // Libera da memoria as estruturas auxiliares
+    h_free(hash);
+    desaloca_arvore(state_tree);
+//  }
 }
