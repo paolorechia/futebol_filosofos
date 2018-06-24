@@ -328,7 +328,7 @@ int main(int argc, char **argv) {
   int pos_bola[MAXINT];
   int num_saltos;
   int i;
-//  int limite_arvore = 5;
+  int limite_arvore = 5; // nao implementado
   
 
   // conecta com o controlador do campo
