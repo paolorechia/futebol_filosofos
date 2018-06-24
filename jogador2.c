@@ -8,16 +8,17 @@
 #define MAXCHT MAXSTR/2
 #define MAXINT 16
 
-int testa_chutes_esq(char ** resultado){
+int testa_chutes_esq(char * campo, int * chutes_esq[MAXCHT],
+                     int * num_chutes_esq, int pos_bola2){
     // testa lado esquerdo
-    int gol_esq;
-    j = pos_bola2 - 1;
-    num_chutes_esq = 0;
+    int gol_esq = 0;
+    int j = pos_bola2 - 1;
+    *num_chutes_esq = 0;
     if (campo[j] == 'f'){ // eh possivel um chute
       while (j > 0){
           if (campo[j] == '.'){
-            chutes_esq[num_chutes_esq]=j + 1;
-            num_chutes_esq++;
+            chutes_esq[*num_chutes_esq]=j + 1;
+            *num_chutes_esq++;
             if (campo[j - 1] == '.'){
               break; // nao ha mais chutes possiveis
             }
@@ -26,23 +27,25 @@ int testa_chutes_esq(char ** resultado){
       }
     }
     if (j == 0 && campo[0] == 'f'){
-      chutes_esq[num_chutes_esq]=j;
-      num_chutes_esq++;
+      chutes_esq[*num_chutes_esq]=j;
+      *num_chutes_esq++;
       gol_esq = 1;
     }
-  return gol_esq;
+   return gol_esq;
 }
 
-char * testa_chutes_dir(char ** resultado){
+int testa_chutes_dir(char * campo, int tam_campo,
+                     int * chutes_dir[MAXCHT], 
+                     int *num_chutes_dir, int pos_bola2){
     // testa lado direito
-//    chutes_dir[i] = 0; 
-    j = pos_bola2 + 1;
-    num_chutes_dir = 0;
+    int gol_dir = 0;
+    int j = pos_bola2 + 1;
+    *num_chutes_dir = 0;
     if (campo[j] == 'f'){ // eh possivel um chute
       while (j < tam_campo){
           if (campo[j] == '.'){
-            chutes_dir[num_chutes_dir]= j + 1;
-            num_chutes_dir++;
+            chutes_dir[*num_chutes_dir]= j + 1;
+            *num_chutes_dir++;
             if (campo[j + 1] == '.'){
               break; // nao ha mais chutes possiveis
             }
@@ -51,20 +54,17 @@ char * testa_chutes_dir(char ** resultado){
       }
     }
     if (j == tam_campo && campo[tam_campo - 1] == 'f'){
-      chutes_dir[num_chutes_dir]=j + 1;
-      num_chutes_dir++;
+      chutes_dir[*num_chutes_dir]=j + 1;
+      *num_chutes_dir++;
       gol_dir = 1;
     }
+    return gol_dir;
 }
-int conta_chutes(chutes){
-
-
-}
-void faz_gol(chutes, lado_meu){
+void faz_gol(int * chutes, int num_chutes, char lado_jogador){
     char buf[MAXSTR];
-    int num_chutes = conta_chutes(chutes);
-    sprintf(buf, "%c o %d ", lado_meu, num_chutes);
-    for (i = 0; i < num_chutes; i++){
+    char num[20];
+    sprintf(buf, "%c o %d ", lado_jogador, num_chutes);
+    for (int i = 0; i < num_chutes; i++){
         sprintf(num, "%d ", chutes[i]);
         strcat(buf, num);
     }
@@ -72,12 +72,12 @@ void faz_gol(chutes, lado_meu){
     strcat(buf, num);
     printf("%s\n", buf);
 }
-void gera_chutes(chutes){
+void gera_chutes(int * chutes, int num_chutes){
     char buf[MAXSTR];
-    num_chutes = conta_chutes(chutes); 
+    char num[20];
     if (num_chutes > 0){
       sprintf(buf, "");
-      for (i = 0; i < num_chutes; i++){
+      for (int i = 0; i < num_chutes; i++){
             // aplicar offset + 1 para os chutes
             sprintf(num, "%d ", chutes[i]);
             strcat(buf, num);
@@ -86,18 +86,18 @@ void gera_chutes(chutes){
     }
 }
 
-void coloca_filosofo(campo, tam_campo, meu_lado){
+void coloca_filosofo(char * campo, int tam_campo, char meu_lado){
     char buf[MAXSTR];
-    for (int i = 0; i < tam_campo){
+    for (int i = 0; i < tam_campo; i++){
       if (campo[i] == '.'){
-        sprintf(buf, "%c f %d\n", lado_meu, i);
+        sprintf(buf, "%c f %d\n", meu_lado, i);
       }
     }
     printf("%s\n", buf);
 }
-int acha_bola(campo, tam_campo){
+int acha_bola(char * campo, int tam_campo){
     int pos_bola2 = -1;
-    for (i = 0; i < tam_campo; i++){
+    for (int i = 0; i < tam_campo; i++){
       if (campo[i] == 'o'){
          pos_bola2 = i;
       }
@@ -113,22 +113,23 @@ void gera_acoes(char * campo, int tam_campo, char lado){
     int gol_dir;
     int i, j;
     int espaco_vazio;
-    char chutes_esq[MAXCHT];
-    char chutes_dir[MAXCHT];
+    int chutes_esq[MAXCHT];
+    int chutes_dir[MAXCHT];
     // acha bola
-    pos_bola = acha_bola(campo, tam_campo);
+    pos_bola2 = acha_bola(campo, tam_campo);
     if (pos_bola2 == -1){
       printf("Jogo encerrado\n");
       return;
     }
     // testar se eh possivel chutar ao gol para algum lado
-    gol_esq = testa_chutes_esq(chutes_esq);
-    gol_dir = testa_chutes_dir(chutes_dir);
-    if (gol_esq) faz_gol(chutes_esq);
-    else gera_chutes(chutes_esq);
-    if (gol_dir) faz_gol(chutes_dir);
-    else gera_chutes(chutes_dir);
-
+    gol_esq = testa_chutes_esq(campo, &chutes_esq, &num_chutes_esq, pos_bola2);
+    gol_dir = testa_chutes_dir(campo, tam_campo, &chutes_dir, &num_chutes_dir, pos_bola2);
+    if (gol_esq && lado == 'd') faz_gol(chutes_esq, num_chutes_esq, lado);
+    else gera_chutes(chutes_esq, num_chutes_esq);
+    if (gol_dir && lado == 'e') faz_gol(chutes_dir, num_chutes_dir, lado);
+    else gera_chutes(chutes_dir, num_chutes_dir);
+    coloca_filosofo(campo, tam_campo, lado);
+/*
     if (lado_meu == 'e' && gol_dir == 1){
     // chutar_gol_dir
     }
@@ -138,6 +139,7 @@ void gera_acoes(char * campo, int tam_campo, char lado){
       coloca_filosofo(campo, tam_campo, pos_bola2, meu_lado);
     }
   }
+*/
 }
 int main(int argc, char **argv) {
 
@@ -159,8 +161,6 @@ int main(int argc, char **argv) {
 
   srand(time(NULL));
   while(1){
-    gol_esq = 0;
-    gol_dir = 0;
     // recebe o campo inicial e o movimento do adversario
     campo_recebe(buf);
     // separa os elementos do string recebido
@@ -179,7 +179,8 @@ int main(int argc, char **argv) {
       }
     }
     gera_acoes(campo, tam_campo, lado_meu);
-    strcpy(buf, "n\n");
+    printf("%s\n", buf);
+    sprintf(buf, "%c n\n", lado_meu);
     campo_envia(buf);  
   }
 }
