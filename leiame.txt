@@ -1,0 +1,63 @@
+########################################################################
+  UFPR - DINF - 2018-2
+  CI209 - Inteligencia Artificial - 2018/2
+  Trabalho pratico 2 - Futebol dos filosofos
+
+  Professor: Fabiano
+  Alunos: Michel Melo de Souza        - GRR 20159342
+          Paolo Andreas Stall Rechia  - GRR 20135196
+
+
+########################################################################
+
+Para compilar:
+
+$ make
+
+Compilará o pacote básico com uma modificação no controlador,
+mais dois executáveis no diretório corrente:
+
+1. randomic - IA aleatória mais simples possível. Verifica se é possível
+  fazer um chute a gol. Se sim, chuta. Senão, insere filósofo em posição
+  aleatória.
+
+2. minimax - uma tentativa mal-sucedida do algoritmo minimax. Só funciona
+jogando do lado esquerdo, para campos pequenos (menores do que aprox. 16),
+porque não foi implementado um limite de nível nem a poda alfa-beta.
+Existem erros no algoritmo que não conseguimos corrigir, e que precisariam
+ser corrigidos antes de refinar o uso de memória do algoritmo.
+
+O minimax utiliza duas estruturas de dados auxiliares:
+
+1 - Tabela Hash de estados, para armazenar evitar estados repetidos.
+2 - Uma árvore de estados com filhos alocados dinamicamente em uma
+    lista encadeada com um nó interno de tipo genérico (void *)
+
+A cada iteração do minimax, a árvore completa de estados é construída
+e o valor para a função de utilidade é calculada.
+
+Aparentemente há algum erro que evita que o algoritmo encontre as melhores
+jogadas. Como não sabemos onde o erro está, pode estar em qualquer lugar,
+(na geração das ações possíveis, na função de utilidade ou na lógica da 
+propagação do minimax)
+
+
+########################################################################
+Testando os programas:
+
+Os dois programas rodam em loop se comunicando com uma versão levemente
+modificada do controlador fornecido pelo professor.
+
+Assim, para rodar um programa, basta (em três terminais diferentes):
+
+* Inicializar controlador modificado normalmente
+./randomic d
+./minimax e
+
+
+########################################################################
+Controlador modificado - no início da execução do controlador, foram
+adicionadas instruções para limpar os movimentos armazenados no REDIS,
+assim os jogadores podem mandar jogadas após o término de um jogo sem
+que isso comprometa a próxima partida.
+########################################################################
