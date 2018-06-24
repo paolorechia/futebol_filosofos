@@ -130,7 +130,7 @@ void coloca_filosofo(tno * state_tree, thashtable * hash,
                      char * campo, int tam_campo, char meu_lado){
     char estado_novo[MAXSTR];
     strcpy(estado_novo, campo);
-    for (int i = 0; i < tam_campo; i++){
+    for (int i = 0; i <= tam_campo; i++){
       if (campo[i] == '.'){
         estado_novo[i] = 'f';
         sprintf(estado_novo, "%s%c", estado_novo, meu_lado);
