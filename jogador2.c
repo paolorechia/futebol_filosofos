@@ -62,17 +62,42 @@ int testa_chutes_dir(char * campo, int tam_campo,
     }
     return gol_dir;
 }
-void faz_gol(int * chutes, int num_chutes, char lado_jogador){
-    char buf[MAXSTR];
-    char num[MAXINT];
-    sprintf(buf, "%c o %d ", lado_jogador, num_chutes);
-    for (int i = 0; i < num_chutes; i++){
-        sprintf(num, "%d ", chutes[i]);
-        strcat(buf, num);
+void faz_gol(tno * state_tree, thashtable * hash,
+             int * chutes, int num_chutes, char lado_jogador, 
+             char * campo, int pos_bola2){
+    char estado_novo[MAXSTR];
+    strcpy(estado_novo, campo);
+    int ultima_pos = chutes[num_chutes - 1];
+    char lado_gol = 'n';
+    if (pos_bola2 > ultima_pos){
+      for (int i = pos_bola2; i > 0 ; i--){
+        estado_novo[i] = '.'; 
+        lado_gol = 'e';
+      }
     }
-    sprintf(num, "\n");
-    strcat(buf, num);
-//    printf("%s", buf);
+    else{
+      for (int i = pos_bola2; i < ultima_pos; i++){
+        estado_novo[i] = '.';
+        lado_gol = 'd';
+      }
+    }
+    sprintf(estado_novo, "%s%c", estado_novo, lado_jogador);
+    tno * novo_no = aloca_filho(state_tree, estado_novo, hash);
+    if (novo_no != NULL){
+      char buf[MAXSTR];
+      char num[MAXINT];
+      sprintf(buf, "%c o %d ", lado_jogador, num_chutes);
+      for (int i = 0; i < num_chutes; i++){
+          sprintf(num, "%d ", chutes[i]);
+          strcat(buf, num);
+      }
+      sprintf(num, "\n");
+      strcat(buf, num);
+      sprintf(novo_no->acao, "%s", buf);
+      novo_no->terminal = 1;
+      novo_no->jogador = lado_jogador;
+      novo_no->gol = lado_gol;
+    }
 }
 void gera_chutes(int * chutes, int num_chutes, char lado_jogador){
     char buf[MAXSTR];
@@ -131,29 +156,42 @@ void gera_acoes(tno * state_tree, thashtable * hash,
     // acha bola
     pos_bola2 = acha_bola(campo, tam_campo);
     if (pos_bola2 == -1){
-      printf("Jogo encerrado\n");
+//      printf("Jogo encerrado\n");
       return;
     }
     // testar se eh possivel chutar ao gol para algum lado
     gol_esq = testa_chutes_esq(campo, &chutes_esq, &num_chutes_esq, pos_bola2);
     gol_dir = testa_chutes_dir(campo, tam_campo, &chutes_dir, &num_chutes_dir, pos_bola2);
-    if (gol_esq && lado == 'd') faz_gol(chutes_esq, num_chutes_esq, lado);
+    if (gol_esq && lado == 'd') faz_gol(state_tree, hash, 
+                                        chutes_esq, num_chutes_esq, lado,
+                                        campo, pos_bola2);
     else gera_chutes(chutes_esq, num_chutes_esq, lado);
-    if (gol_dir && lado == 'e') faz_gol(chutes_dir, num_chutes_dir, lado);
+    if (gol_dir && lado == 'e') faz_gol(state_tree, hash, 
+                                        chutes_dir, num_chutes_dir, lado,
+                                        campo, pos_bola2);
     else gera_chutes(chutes_dir, num_chutes_dir, lado);
     coloca_filosofo(state_tree, hash, campo, tam_campo, lado);
     free(chutes_esq);
     free(chutes_dir);
 }
 
-int f_utilidade(char * estado){
+int f_utilidade(tno * atual, char jogador){
   // le campo e lado do estado
   char campo[MAXSTR];
-  strcpy(campo, estado);
+  strcpy(campo, atual->estado);
   int tam_campo = strlen(campo);
   char lado = campo[tam_campo -1];
   campo[tam_campo - 1]='\0';
   tam_campo--;
+
+  if 
+
+  // Jogo encerrado
+  if (atual->terminal == 1){
+    if (atual->gol == lado)
+      return -1000;
+    else return 1000;
+  }
 
   int pos_bola2;
   int num_chutes_esq = 0;
@@ -166,7 +204,7 @@ int f_utilidade(char * estado){
   // acha bola
   pos_bola2 = acha_bola(campo, tam_campo);
   if (pos_bola2 == -1){
-    printf("Jogo encerrado\n");
+//    printf("Jogo encerrado\n");
     free(chutes_esq);
     free(chutes_dir);
     return valor;
@@ -195,7 +233,7 @@ void minimax(tno * state_tree, thashtable * hash){
   while (no){
     tno * atual = (tno *) no->no_atual;
 //    printf("%d %s %d\n", atual->profundidade, atual->estado, f_utilidade(atual->estado));
-    if (atual->profundidade < atual->limite){
+    if (atual->profundidade < atual->limite && atual->terminal == 0){
       char campo[MAXSTR];
       strcpy(campo, atual->estado);
       int tam_campo = strlen(campo);
@@ -209,7 +247,7 @@ void minimax(tno * state_tree, thashtable * hash){
     }
     else{
       // calcular minimax
-      printf("%s %d\n", atual->estado, f_utilidade(atual->estado));
+      printf("%s %d\n", atual->estado, f_utilidade(atual));
       return;
     }
   }
@@ -227,7 +265,7 @@ int main(int argc, char **argv) {
   int pos_bola[MAXINT];
   int num_saltos;
   int i;
-  int limite_arvore = 5;
+  int limite_arvore = 10;
   
 
   // conecta com o controlador do campo

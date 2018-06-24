@@ -22,6 +22,9 @@ typedef struct no{
   int util; 
   int profundidade;
   int limite;
+  int terminal;
+  char jogador;
+  char gol;
   t_list * filhos;
   struct no * pai;
 } tno;

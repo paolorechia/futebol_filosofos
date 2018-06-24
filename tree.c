@@ -19,6 +19,9 @@ tno * aloca_no(char * estado, thashtable * hash,
     no->profundidade = prof;
     no->limite = lim;
     no->pai = pai;
+    no->terminal = 0;
+    no->jogador= 'n';
+    no->gol= 'n';
     no->filhos = NULL;
     return no;
 }
