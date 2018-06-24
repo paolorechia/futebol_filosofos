@@ -23,6 +23,7 @@ tno * aloca_no(char * estado, thashtable * hash,
     no->jogador= 'n';
     no->gol= 'n';
     no->filhos = NULL;
+    no->gbest = NULL;
     return no;
 }
 

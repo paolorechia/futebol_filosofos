@@ -130,7 +130,7 @@ void coloca_filosofo(tno * state_tree, thashtable * hash,
                      char * campo, int tam_campo, char meu_lado){
     char estado_novo[MAXSTR];
     strcpy(estado_novo, campo);
-    for (int i = 0; i < tam_campo; i++){
+    for (int i = 0; i <= tam_campo; i++){
       if (campo[i] == '.'){
         estado_novo[i] = 'f';
         sprintf(estado_novo, "%s%c", estado_novo, meu_lado);
@@ -162,11 +162,11 @@ void gera_acoes(tno * state_tree, thashtable * hash,
     // testar se eh possivel chutar ao gol para algum lado
     gol_esq = testa_chutes_esq(campo, &chutes_esq, &num_chutes_esq, pos_bola2);
     gol_dir = testa_chutes_dir(campo, tam_campo, &chutes_dir, &num_chutes_dir, pos_bola2);
-    if (gol_esq && lado == 'd') faz_gol(state_tree, hash, 
-                                        chutes_esq, num_chutes_esq, lado,
-                                        campo, pos_bola2);
+    if (gol_esq) faz_gol(state_tree, hash, 
+                 chutes_esq, num_chutes_esq, lado,
+                 campo, pos_bola2);
     else gera_chutes(chutes_esq, num_chutes_esq, lado);
-    if (gol_dir && lado == 'e') faz_gol(state_tree, hash, 
+    if (gol_dir) faz_gol(state_tree, hash, 
                                         chutes_dir, num_chutes_dir, lado,
                                         campo, pos_bola2);
     else gera_chutes(chutes_dir, num_chutes_dir, lado);
@@ -389,9 +389,13 @@ int minimax(tno * state_tree, thashtable * hash, char jogador){
     printf("TERMINAL: %s %d\n", state_tree->estado, f_utilidade(state_tree, jogador));
     return f_utilidade(state_tree, jogador);
   }
+  if (state_tree->filhos == NULL){
+    return;
+  }
   else{
     int max = -99999;
     l_node * no = state_tree->filhos->head->nxt;
+    tno * max_no = NULL;
     while (no){
         tno * atual = (tno *) no->no_atual;
   //    printf("%d %s %d\n", atual->profundidade, atual->estado, f_utilidade(atual->estado));
@@ -404,15 +408,23 @@ int minimax(tno * state_tree, thashtable * hash, char jogador){
         else
           gera_acoes(atual, hash, campo, tam_campo -2, 'd');
         int v = minimax(atual, hash, jogador);
-        if (v > max) max = v;
+        if (atual->estado[tam_campo - 1] == jogador){
+          v = - v;
+        }
+        if (v > max){
+           max = v;
+           max_no = atual;
+        }
         no = no->nxt;
         printf("%d %s %d\n", atual->profundidade, atual->estado, f_utilidade(atual, jogador));
     }
     state_tree->util = max;
+    state_tree->gbest = max_no;
 //    printf("(max)%d %s %d\n", state_tree->profundidade, state_tree->util, f_utilidade(state_tree, jogador));
     return max;
   }
 }
+
 
 char * acao_max(tno * state_tree){
   if (state_tree->filhos == NULL){
@@ -477,14 +489,18 @@ int main(int argc, char **argv) {
     sprintf(estado_atual, "%s%c", estado_atual, lado_meu);
     tno * state_tree = aloca_raiz(estado_atual, hash, limite_arvore);
     gera_acoes(state_tree, hash, campo, tam_campo, lado_meu);
-    minimax(state_tree, hash, lado_meu);
-//    char * acao = minimax2(state_tree, hash, lado_meu);
-    printf("%d\n", state_tree->util);
-    sprintf(buf, "%s", acao_max(state_tree));
-//    printf("%s", acao);
-//    campo_envia(acao);
-    campo_envia(buf);
-    printf("%s", buf);
+//    minimax(state_tree, hash, lado_meu);
+//    campo_envia(buf);
+//    printf("%s", buf);
+//    printf("%d\n", state_tree->util);
+//    printf("%s\n", state_tree->gbest->acao);
+//    campo_envia(state_tree->gbest->acao);
+//    sprintf(buf, "%s", acao_max(state_tree));
+
+    char * acao = minimax2(state_tree, hash, lado_meu);
+    printf("%s", acao);
+    campo_envia(acao);
+
     // Libera da memoria as estruturas auxiliares
     h_free(hash);
     desaloca_arvore(state_tree);

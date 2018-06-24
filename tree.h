@@ -27,6 +27,7 @@ typedef struct no{
   char gol;
   t_list * filhos;
   struct no * pai;
+  struct no * gbest;
 } tno;
 
 
