@@ -32,7 +32,7 @@ tno * aloca_filho(tno * no_pai, char * estado, thashtable * hash){
       no_pai->filhos=tl_init();
     }
     int lim = no_pai->limite;
-    int prof= no_pai->profundidade++;
+    int prof= no_pai->profundidade + 1;
     tno * filho = aloca_no(estado, hash, lim, prof, no_pai);
     if (filho != NULL){
       tl_insert(no_pai->filhos, filho);

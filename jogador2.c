@@ -91,6 +91,16 @@ void gera_chutes(int * chutes, int num_chutes, char lado_jogador){
     }
 }
 
+int acha_bola(char * campo, int tam_campo){
+    int pos_bola2 = -1;
+    for (int i = 0; i < tam_campo; i++){
+      if (campo[i] == 'o'){
+         pos_bola2 = i;
+      }
+    }
+    return pos_bola2;
+}
+
 void coloca_filosofo(tno * state_tree, thashtable * hash, 
                      char * campo, int tam_campo, char meu_lado){
     char estado_novo[MAXSTR];
@@ -102,20 +112,11 @@ void coloca_filosofo(tno * state_tree, thashtable * hash,
         tno * novo_no = aloca_filho(state_tree, estado_novo, hash);
         if (novo_no != NULL){
           sprintf(novo_no->acao, "%c f %d\n", meu_lado, i);
-//          printf("%s", novo_no->acao);
+//          printf("%s\n", novo_no->estado);
         }
         strcpy(estado_novo, campo);
       }
     }
-}
-int acha_bola(char * campo, int tam_campo){
-    int pos_bola2 = -1;
-    for (int i = 0; i < tam_campo; i++){
-      if (campo[i] == 'o'){
-         pos_bola2 = i;
-      }
-    }
-    return pos_bola2;
 }
 
 void gera_acoes(tno * state_tree, thashtable * hash, 
@@ -145,6 +146,47 @@ void gera_acoes(tno * state_tree, thashtable * hash,
     free(chutes_dir);
 }
 
+int f_utilidade(char * estado){
+  // le campo e lado do estado
+  char campo[MAXSTR];
+  strcpy(campo, estado);
+  int tam_campo = strlen(campo);
+  char lado = campo[tam_campo -1];
+  campo[tam_campo - 1]='\0';
+  tam_campo--;
+
+  int pos_bola2;
+  int num_chutes_esq = 0;
+  int num_chutes_dir = 0;
+  int gol_esq;
+  int gol_dir;
+  int * chutes_esq = malloc(sizeof(int) * MAXCHT);
+  int * chutes_dir = malloc(sizeof(int) * MAXCHT);
+  int valor = 0;
+  // acha bola
+  pos_bola2 = acha_bola(campo, tam_campo);
+  if (pos_bola2 == -1){
+    printf("Jogo encerrado\n");
+    free(chutes_esq);
+    free(chutes_dir);
+    return valor;
+  }
+  // testar se eh possivel chutar ao gol para algum lado
+  gol_esq = testa_chutes_esq(campo, &chutes_esq, &num_chutes_esq, pos_bola2);
+  gol_dir = testa_chutes_dir(campo, tam_campo, &chutes_dir, &num_chutes_dir, pos_bola2);
+  if (lado == 'd'){
+    if (gol_esq) valor = tam_campo*10;
+    if (gol_dir) valor = -tam_campo*10;
+  }
+  else{
+    if (gol_esq) valor = -tam_campo*10;
+    if (gol_dir) valor = tam_campo*10;
+  }
+  free(chutes_esq);
+  free(chutes_dir);
+  return valor;
+}
+
 void minimax(tno * state_tree, thashtable * hash){
   if (state_tree->filhos == NULL){
     return;
@@ -152,6 +194,7 @@ void minimax(tno * state_tree, thashtable * hash){
   l_node * no = state_tree->filhos->head->nxt;
   while (no){
     tno * atual = (tno *) no->no_atual;
+//    printf("%d %s %d\n", atual->profundidade, atual->estado, f_utilidade(atual->estado));
     if (atual->profundidade < atual->limite){
       char campo[MAXSTR];
       strcpy(campo, atual->estado);
@@ -166,11 +209,12 @@ void minimax(tno * state_tree, thashtable * hash){
     }
     else{
       // calcular minimax
-      printf("%s\n", atual->estado);
+      printf("%s %d\n", atual->estado, f_utilidade(atual->estado));
       return;
     }
   }
 }
+
 int main(int argc, char **argv) {
 
   char buf[MAXSTR];
@@ -183,14 +227,14 @@ int main(int argc, char **argv) {
   int pos_bola[MAXINT];
   int num_saltos;
   int i;
-  int limite_arvore = 3;
+  int limite_arvore = 5;
   
 
   // conecta com o controlador do campo
   campo_conecta(argc, argv);
 
   srand(time(NULL));
-  while(1){
+//  while(1){
     // recebe o campo inicial e o movimento do adversario
     campo_recebe(buf);
     // separa os elementos do string recebido
@@ -215,11 +259,33 @@ int main(int argc, char **argv) {
     tno * state_tree = aloca_raiz(estado_atual, hash, limite_arvore);
     gera_acoes(state_tree, hash, campo, tam_campo, lado_meu);
     minimax(state_tree, hash);
+/*
+    if (state_tree->filhos == NULL){
+    }
+    else{
+      l_node * no = state_tree->filhos->head->nxt;
+      while (no){
+        tno * atual = (tno *) no->no_atual;
+        printf("%d %s %d\n", atual->profundidade, atual->estado, f_utilidade(atual->estado));
+        if (atual->profundidade < atual->limite){
+          char campo[MAXSTR];
+          strcpy(campo, atual->estado);
+          int tam_campo = strlen(campo);
+          campo[tam_campo - 1]='\0';
+          if (atual->estado[tam_campo - 1] == 'd')
+            gera_acoes(atual, hash, campo, tam_campo -2, 'e');
+          else
+            gera_acoes(atual, hash, campo, tam_campo -2, 'd');
+        }
+        no = no->nxt;
+      }
+    }
+*/
     sprintf(buf, "%c n\n", lado_meu);
 //    printf("%s\n", buf);
     campo_envia(buf);  
     // Libera da memoria as estruturas auxiliares
     h_free(hash);
     desaloca_arvore(state_tree);
-  }
+//  }
 }
