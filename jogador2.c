@@ -94,9 +94,9 @@ void coloca_filosofo(char * campo, int tam_campo, char meu_lado){
     for (int i = 0; i < tam_campo; i++){
       if (campo[i] == '.'){
         sprintf(buf, "%c f %d\n", meu_lado, i);
+        printf("%s", buf);
       }
     }
-    printf("%s", buf);
 }
 int acha_bola(char * campo, int tam_campo){
     int pos_bola2 = -1;
@@ -130,17 +130,6 @@ void gera_acoes(char * campo, int tam_campo, char lado){
     if (gol_dir && lado == 'e') faz_gol(chutes_dir, num_chutes_dir, lado);
     else gera_chutes(chutes_dir, num_chutes_dir, lado);
     coloca_filosofo(campo, tam_campo, lado);
-/*
-    if (lado_meu == 'e' && gol_dir == 1){
-    // chutar_gol_dir
-    }
-    else if (lado_meu == 'd' && gol_esq == 1){
-    // nao eh possivel fazer gol, inserir filosofos
-    else{
-      coloca_filosofo(campo, tam_campo, pos_bola2, meu_lado);
-    }
-  }
-*/
     free(chutes_esq);
     free(chutes_dir);
 }
