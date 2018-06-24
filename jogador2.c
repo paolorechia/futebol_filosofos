@@ -273,7 +273,7 @@ char * acao_max(tno * state_tree){
     l_node * no = state_tree->filhos->head->nxt;
     while (no){
       tno * atual = (tno *) no->no_atual;
-      if (atual->util == state_tree->util){
+      if (atual->util < state_tree->util){
         return atual->acao;
       }
       no = no->nxt;
