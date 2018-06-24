@@ -13,4 +13,4 @@ minimax: campo.h campo.c hashtable.c tree.c minimax.c
 	gcc $(CFLAGS) campo.h campo.c list.h list.c hashtable.h hashtable.c tree.h tree.c minimax.c $(LDLIBS) -o minimax 
 
 clean:
-	rm -f controlador minimax random *.o
+	rm -f controlador minimax randomic *.o
